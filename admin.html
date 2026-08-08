@@ -37,6 +37,10 @@
   .atb { background: transparent; color: #64748b; }
   .atb.active { background: #1e3a8a; color: #fff; }
   .atb:hover:not(.active) { background: #eef1f8; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details summary .chev { transition: transform 0.2s ease; }
+  details[open] summary .chev { transform: rotate(90deg); }
   @media (prefers-reduced-motion: reduce) { *, .transition { transition: none !important; } }
 </style>
 </head>
@@ -49,7 +53,7 @@
       <i data-lucide="shield-check" class="w-7 h-7 text-gold"></i>
     </div>
     <h1 class="text-xl font-extrabold text-navy text-center mb-1">Panel Admin Sekolah</h1>
-    <p class="text-sm text-slate-500 text-center mb-6">Masuk untuk mengelola profil sekolah &amp; data guru</p>
+    <p class="text-sm text-slate-500 text-center mb-6">Masuk untuk mengelola konten website</p>
     <form id="loginForm" class="space-y-4">
       <div>
         <label class="field-label">Password Admin</label>
@@ -86,6 +90,9 @@
     </div>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex gap-2 pb-3 overflow-x-auto">
       <button onclick="switchAdminTab('profil')" id="atbProfil" class="atb active px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Profil Sekolah</button>
+      <button onclick="switchAdminTab('konten')" id="atbKonten" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Konten Website</button>
+      <button onclick="switchAdminTab('berita')" id="atbBerita" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Berita</button>
+      <button onclick="switchAdminTab('pengumuman')" id="atbPengumuman" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Pengumuman</button>
       <button onclick="switchAdminTab('guru')" id="atbGuru" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Data Guru</button>
     </div>
   </header>
@@ -162,6 +169,145 @@
       </div>
     </section>
 
+    <!-- ============ PANEL: KONTEN WEBSITE ============ -->
+    <section id="panelKontenAdmin" class="hidden">
+      <p class="text-sm text-slate-500 mb-5">Semua teks di bawah ini tampil langsung di halaman website sesuai menunya. Untuk daftar (misalnya Misi atau Fasilitas), tulis <strong>satu poin per baris</strong>.</p>
+      <form id="formKonten" class="space-y-5">
+
+        <details open class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>Beranda — Judul Utama</summary>
+          <div class="mt-4 space-y-4 pl-6">
+            <div><label class="field-label">Judul (Headline)</label><input id="kHeroHeadline" class="field-input"></div>
+            <div><label class="field-label">Sub-judul</label><textarea id="kHeroSub" rows="2" class="field-input"></textarea></div>
+          </div>
+        </details>
+
+        <details class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>Beranda — Keunggulan Sekolah (4 Kartu)</summary>
+          <div class="mt-4 grid sm:grid-cols-2 gap-4 pl-6">
+            <div class="p-4 bg-cloud rounded-xl space-y-2"><p class="text-xs font-bold text-gold-dark">Kartu 1</p><input id="kK1Judul" placeholder="Judul" class="field-input"><textarea id="kK1Desc" rows="2" placeholder="Deskripsi" class="field-input"></textarea></div>
+            <div class="p-4 bg-cloud rounded-xl space-y-2"><p class="text-xs font-bold text-gold-dark">Kartu 2</p><input id="kK2Judul" placeholder="Judul" class="field-input"><textarea id="kK2Desc" rows="2" placeholder="Deskripsi" class="field-input"></textarea></div>
+            <div class="p-4 bg-cloud rounded-xl space-y-2"><p class="text-xs font-bold text-gold-dark">Kartu 3</p><input id="kK3Judul" placeholder="Judul" class="field-input"><textarea id="kK3Desc" rows="2" placeholder="Deskripsi" class="field-input"></textarea></div>
+            <div class="p-4 bg-cloud rounded-xl space-y-2"><p class="text-xs font-bold text-gold-dark">Kartu 4</p><input id="kK4Judul" placeholder="Judul" class="field-input"><textarea id="kK4Desc" rows="2" placeholder="Deskripsi" class="field-input"></textarea></div>
+          </div>
+        </details>
+
+        <details class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>Profil — Sejarah &amp; Visi Misi</summary>
+          <div class="mt-4 space-y-4 pl-6">
+            <div><label class="field-label">Sejarah Singkat</label><textarea id="kSejarah" rows="4" class="field-input"></textarea></div>
+            <div><label class="field-label">Visi</label><textarea id="kVisi" rows="2" class="field-input"></textarea></div>
+            <div><label class="field-label">Misi (satu poin per baris)</label><textarea id="kMisi" rows="4" class="field-input"></textarea></div>
+          </div>
+        </details>
+
+        <details class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>Profil — Fasilitas</summary>
+          <div class="mt-4 pl-6">
+            <label class="field-label">Daftar Fasilitas (satu nama per baris)</label>
+            <textarea id="kFasilitas" rows="5" class="field-input" placeholder="Perpustakaan&#10;Lab Komputer&#10;Lapangan Olahraga"></textarea>
+          </div>
+        </details>
+
+        <details class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>Akademik — Kurikulum &amp; Ekstrakurikuler</summary>
+          <div class="mt-4 space-y-4 pl-6">
+            <div><label class="field-label">Deskripsi Kurikulum</label><textarea id="kKurikulumDesc" rows="3" class="field-input"></textarea></div>
+            <div><label class="field-label">Poin Kurikulum (satu poin per baris)</label><textarea id="kKurikulumPoin" rows="3" class="field-input"></textarea></div>
+            <div><label class="field-label">Deskripsi Ekstrakurikuler</label><textarea id="kEkskulDesc" rows="2" class="field-input"></textarea></div>
+            <div><label class="field-label">Daftar Ekstrakurikuler (satu per baris)</label><textarea id="kEkskulList" rows="4" class="field-input"></textarea></div>
+          </div>
+        </details>
+
+        <details class="bg-white rounded-2xl border border-slate-100 p-6">
+          <summary class="font-bold text-navy text-sm cursor-pointer flex items-center gap-2"><i data-lucide="chevron-right" class="chev w-4 h-4"></i>PPDB — Persyaratan &amp; Alur</summary>
+          <div class="mt-4 space-y-4 pl-6">
+            <div><label class="field-label">Persyaratan Pendaftaran (satu per baris)</label><textarea id="kPpdbSyarat" rows="4" class="field-input"></textarea></div>
+            <div><label class="field-label">Alur Pendaftaran (satu langkah per baris, urut)</label><textarea id="kPpdbAlur" rows="4" class="field-input"></textarea></div>
+          </div>
+        </details>
+
+        <button type="submit" id="btnSimpanKonten" class="bg-navy hover:bg-navy-dark text-white font-bold px-7 py-3 rounded-xl flex items-center justify-center gap-2">
+          <span>Simpan Semua Konten</span><i data-lucide="save" class="w-4 h-4"></i>
+        </button>
+      </form>
+    </section>
+
+    <!-- ============ PANEL: BERITA ============ -->
+    <section id="panelBeritaAdmin" class="hidden">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-100 p-6 sm:p-7 h-fit">
+          <p class="font-bold text-navy text-sm mb-1" id="beritaFormTitle">Tambah Berita Baru</p>
+          <p class="text-xs text-slate-400 mb-5">Tampil di Beranda &amp; halaman Berita</p>
+          <form id="formBerita" class="space-y-4">
+            <input type="hidden" id="bId">
+            <div class="flex flex-col items-center mb-2">
+              <img id="previewBerita" src="" alt="" class="w-full h-32 rounded-xl object-cover border-4 border-cloud hidden">
+              <div id="placeholderBerita" class="w-full h-32 rounded-xl bg-cloud border-4 border-slate-100 flex items-center justify-center">
+                <i data-lucide="image" class="w-7 h-7 text-slate-300"></i>
+              </div>
+              <label class="mt-3 cursor-pointer text-xs font-bold text-navy bg-navy/10 hover:bg-navy hover:text-white px-4 py-2 rounded-full flex items-center gap-1.5">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>Pilih Gambar
+                <input type="file" accept="image/*" class="hidden" id="inputBerita" onchange="handleImagePreview(this,'previewBerita','placeholderBerita','berita')">
+              </label>
+            </div>
+            <div><label class="field-label">Judul</label><input required id="bJudul" class="field-input"></div>
+            <div><label class="field-label">Kategori</label><input id="bKategori" class="field-input" placeholder="Contoh: Prestasi, Kegiatan, Pengumuman"></div>
+            <div><label class="field-label">Tanggal</label><input required type="date" id="bTanggal" class="field-input"></div>
+            <div><label class="field-label">Ringkasan</label><textarea id="bRingkasan" rows="2" class="field-input"></textarea></div>
+            <div><label class="field-label">Isi Lengkap</label><textarea id="bIsiLengkap" rows="5" class="field-input"></textarea></div>
+            <div class="flex gap-2 pt-1">
+              <button type="submit" id="btnSimpanBerita" class="flex-1 bg-navy hover:bg-navy-dark text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm"><span>Simpan</span><i data-lucide="save" class="w-4 h-4"></i></button>
+              <button type="button" id="btnBatalBerita" onclick="resetFormBerita()" class="hidden px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 font-semibold text-sm hover:bg-slate-50">Batal</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <p class="font-bold text-navy text-sm">Daftar Berita (<span id="beritaCount">0</span>)</p>
+            <button onclick="loadBeritaAdmin()" class="text-xs font-semibold text-navy flex items-center gap-1 hover:text-gold-dark"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Muat Ulang</button>
+          </div>
+          <div id="listBeritaAdmin" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PANEL: PENGUMUMAN ============ -->
+    <section id="panelPengumumanAdmin" class="hidden">
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-100 p-6 sm:p-7 h-fit">
+          <p class="font-bold text-navy text-sm mb-1" id="pengumumanFormTitle">Tambah Pengumuman</p>
+          <p class="text-xs text-slate-400 mb-5">Tampil di halaman Berita &amp; Pengumuman</p>
+          <form id="formPengumuman" class="space-y-4">
+            <input type="hidden" id="pmId">
+            <div><label class="field-label">Judul</label><input required id="pmJudul" class="field-input"></div>
+            <div><label class="field-label">Tanggal</label><input required type="date" id="pmTanggal" class="field-input"></div>
+            <div><label class="field-label">Isi Pengumuman</label><textarea required id="pmIsi" rows="4" class="field-input"></textarea></div>
+            <div>
+              <label class="field-label">Lampiran (opsional — PDF/gambar/dokumen)</label>
+              <label class="cursor-pointer text-xs font-bold text-navy bg-navy/10 hover:bg-navy hover:text-white px-4 py-2 rounded-full flex items-center gap-1.5 w-fit">
+                <i data-lucide="paperclip" class="w-3.5 h-3.5"></i><span id="lampiranLabel">Pilih File</span>
+                <input type="file" class="hidden" id="inputLampiran" onchange="handleLampiranSelect(this)">
+              </label>
+              <p class="text-[11px] text-slate-400 mt-2">Maksimal 10MB</p>
+            </div>
+            <div class="flex gap-2 pt-1">
+              <button type="submit" id="btnSimpanPengumuman" class="flex-1 bg-navy hover:bg-navy-dark text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm"><span>Simpan</span><i data-lucide="save" class="w-4 h-4"></i></button>
+              <button type="button" id="btnBatalPengumuman" onclick="resetFormPengumuman()" class="hidden px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 font-semibold text-sm hover:bg-slate-50">Batal</button>
+            </div>
+          </form>
+        </div>
+        <div class="lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <p class="font-bold text-navy text-sm">Daftar Pengumuman (<span id="pengumumanCount">0</span>)</p>
+            <button onclick="loadPengumumanAdmin()" class="text-xs font-semibold text-navy flex items-center gap-1 hover:text-gold-dark"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Muat Ulang</button>
+          </div>
+          <div id="listPengumumanAdmin" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ PANEL: DATA GURU ============ -->
     <section id="panelGuruAdmin" class="hidden">
       <div class="grid lg:grid-cols-3 gap-6">
@@ -217,16 +363,25 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyX1pP56Qd_36Km9Uqx6um-
    jadi admin perlu login ulang setiap kali membuka halaman ini. */
 let session = { password: null };
 let guruList = [];
+let beritaList = [];
+let pengumumanList = [];
 let profilData = {};
 let pendingLogo = null;
 let pendingKepsek = null;
 let pendingGuruFoto = null;
+let pendingBeritaGambar = null;
+let pendingLampiran = null; // { base64, nama, mime }
+
+const ADMIN_TABS = ['profil', 'konten', 'berita', 'pengumuman', 'guru'];
 
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
   document.getElementById('formProfil').addEventListener('submit', handleSimpanProfil);
+  document.getElementById('formKonten').addEventListener('submit', handleSimpanKonten);
   document.getElementById('formGuru').addEventListener('submit', handleSimpanGuru);
+  document.getElementById('formBerita').addEventListener('submit', handleSimpanBerita);
+  document.getElementById('formPengumuman').addEventListener('submit', handleSimpanPengumuman);
 });
 
 /* ---------- AUTH ---------- */
@@ -250,8 +405,10 @@ async function handleLogin(e) {
       session.password = pw;
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
-      loadProfilAdmin();
+      loadProfilAdmin().then(loadKontenAdmin);
       loadGuruAdmin();
+      loadBeritaAdmin();
+      loadPengumumanAdmin();
     } else {
       errEl.textContent = 'Password salah. Silakan coba lagi.';
       errEl.classList.remove('hidden');
@@ -304,6 +461,7 @@ function handleImagePreview(input, previewId, placeholderId, target) {
     if (target === 'logo') pendingLogo = base64;
     if (target === 'kepsek') pendingKepsek = base64;
     if (target === 'guru') pendingGuruFoto = base64;
+    if (target === 'berita') pendingBeritaGambar = base64;
   }).catch(() => showToast('Gagal memproses gambar. Coba file lain.', 'error'));
 }
 
@@ -329,12 +487,29 @@ function resizeImage(file, maxSize, quality) {
   });
 }
 
+/* ---------- UPLOAD LAMPIRAN (file apapun, tanpa kompresi gambar) ---------- */
+function handleLampiranSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('Ukuran lampiran maksimal 10MB.', 'error'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pendingLampiran = { base64: e.target.result, nama: file.name, mime: file.type || 'application/octet-stream' };
+    document.getElementById('lampiranLabel').textContent = file.name;
+  };
+  reader.onerror = () => showToast('Gagal membaca file.', 'error');
+  reader.readAsDataURL(file);
+}
+
 /* ---------- TAB ---------- */
 function switchAdminTab(tab) {
-  document.getElementById('atbProfil').classList.toggle('active', tab === 'profil');
-  document.getElementById('atbGuru').classList.toggle('active', tab === 'guru');
-  document.getElementById('panelProfilAdmin').classList.toggle('hidden', tab !== 'profil');
-  document.getElementById('panelGuruAdmin').classList.toggle('hidden', tab !== 'guru');
+  ADMIN_TABS.forEach(t => {
+    const cap = t.charAt(0).toUpperCase() + t.slice(1);
+    const tabBtn = document.getElementById('atb' + cap);
+    const panel = document.getElementById('panel' + cap + 'Admin');
+    if (tabBtn) tabBtn.classList.toggle('active', t === tab);
+    if (panel) panel.classList.toggle('hidden', t !== tab);
+  });
 }
 
 /* ---------- PROFIL SEKOLAH ---------- */
@@ -407,25 +582,246 @@ async function handleSimpanProfil(e) {
   }
 }
 
+/* ---------- KONTEN WEBSITE ---------- */
+function loadKontenAdmin() {
+  const p = profilData;
+  document.getElementById('kHeroHeadline').value = p.hero_headline || '';
+  document.getElementById('kHeroSub').value = p.hero_subheadline || '';
+  document.getElementById('kK1Judul').value = p.keunggulan1_judul || ''; document.getElementById('kK1Desc').value = p.keunggulan1_desc || '';
+  document.getElementById('kK2Judul').value = p.keunggulan2_judul || ''; document.getElementById('kK2Desc').value = p.keunggulan2_desc || '';
+  document.getElementById('kK3Judul').value = p.keunggulan3_judul || ''; document.getElementById('kK3Desc').value = p.keunggulan3_desc || '';
+  document.getElementById('kK4Judul').value = p.keunggulan4_judul || ''; document.getElementById('kK4Desc').value = p.keunggulan4_desc || '';
+  document.getElementById('kSejarah').value = p.sejarah || '';
+  document.getElementById('kVisi').value = p.visi || '';
+  document.getElementById('kMisi').value = p.misi || '';
+  document.getElementById('kFasilitas').value = p.fasilitas || '';
+  document.getElementById('kKurikulumDesc').value = p.kurikulum_desc || '';
+  document.getElementById('kKurikulumPoin').value = p.kurikulum_poin || '';
+  document.getElementById('kEkskulDesc').value = p.ekskul_desc || '';
+  document.getElementById('kEkskulList').value = p.ekskul_list || '';
+  document.getElementById('kPpdbSyarat').value = p.ppdb_syarat || '';
+  document.getElementById('kPpdbAlur').value = p.ppdb_alur || '';
+}
+
+async function handleSimpanKonten(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSimpanKonten');
+  const label = btn.querySelector('span');
+  btn.disabled = true; const original = label.textContent; label.textContent = 'Menyimpan...';
+  try {
+    const fields = {
+      hero_headline: document.getElementById('kHeroHeadline').value,
+      hero_subheadline: document.getElementById('kHeroSub').value,
+      keunggulan1_judul: document.getElementById('kK1Judul').value, keunggulan1_desc: document.getElementById('kK1Desc').value,
+      keunggulan2_judul: document.getElementById('kK2Judul').value, keunggulan2_desc: document.getElementById('kK2Desc').value,
+      keunggulan3_judul: document.getElementById('kK3Judul').value, keunggulan3_desc: document.getElementById('kK3Desc').value,
+      keunggulan4_judul: document.getElementById('kK4Judul').value, keunggulan4_desc: document.getElementById('kK4Desc').value,
+      sejarah: document.getElementById('kSejarah').value,
+      visi: document.getElementById('kVisi').value,
+      misi: document.getElementById('kMisi').value,
+      fasilitas: document.getElementById('kFasilitas').value,
+      kurikulum_desc: document.getElementById('kKurikulumDesc').value,
+      kurikulum_poin: document.getElementById('kKurikulumPoin').value,
+      ekskul_desc: document.getElementById('kEkskulDesc').value,
+      ekskul_list: document.getElementById('kEkskulList').value,
+      ppdb_syarat: document.getElementById('kPpdbSyarat').value,
+      ppdb_alur: document.getElementById('kPpdbAlur').value,
+    };
+    const res = await postToApi('update_profil', { fields });
+    if (res.success) {
+      showToast('Konten website berhasil disimpan.', 'success');
+      await loadProfilAdmin();
+      loadKontenAdmin();
+    } else {
+      showToast(res.error || 'Gagal menyimpan konten.', 'error');
+    }
+  } catch (err) {
+    showToast('Terjadi kesalahan koneksi ke server.', 'error');
+  } finally {
+    btn.disabled = false; label.textContent = original;
+  }
+}
+
+/* ---------- BERITA ---------- */
+async function loadBeritaAdmin() {
+  document.getElementById('listBeritaAdmin').innerHTML = loadingCard();
+  try {
+    const data = await getFromApi('berita');
+    beritaList = (data.berita || []).slice().sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    renderBeritaAdminList();
+  } catch (err) {
+    document.getElementById('listBeritaAdmin').innerHTML = errorCard('Gagal memuat data berita.');
+  }
+}
+function renderBeritaAdminList() {
+  document.getElementById('beritaCount').textContent = beritaList.length;
+  const wrap = document.getElementById('listBeritaAdmin');
+  if (!beritaList.length) { wrap.innerHTML = emptyCard('Belum ada berita. Tambahkan lewat form di samping.'); return; }
+  wrap.innerHTML = beritaList.map(b => {
+    const gambar = b.gambar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.kategori || 'Berita')}&background=1e3a8a&color=eab308&size=100`;
+    return `
+    <div class="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-4">
+      <img src="${escapeHtml(gambar)}" alt="" class="w-16 h-16 rounded-lg object-cover shrink-0">
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-navy text-sm truncate">${escapeHtml(b.judul)}</p>
+        <p class="text-xs text-slate-400 truncate">${escapeHtml(b.kategori || '')} · ${formatTanggalAdmin(b.tanggal)}</p>
+      </div>
+      <button onclick="editBerita('${escapeHtml(String(b.id))}')" class="w-9 h-9 rounded-lg bg-navy/10 hover:bg-navy hover:text-white text-navy flex items-center justify-center shrink-0" aria-label="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+      <button onclick="hapusBerita('${escapeHtml(String(b.id))}')" class="w-9 h-9 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-600 flex items-center justify-center shrink-0" aria-label="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+function editBerita(id) {
+  const b = beritaList.find(x => String(x.id) === String(id));
+  if (!b) return;
+  document.getElementById('bId').value = b.id;
+  document.getElementById('bJudul').value = b.judul || '';
+  document.getElementById('bKategori').value = b.kategori || '';
+  document.getElementById('bTanggal').value = toDateInputValue(b.tanggal);
+  document.getElementById('bRingkasan').value = b.ringkasan || '';
+  document.getElementById('bIsiLengkap').value = b.isi_lengkap || '';
+  pendingBeritaGambar = null;
+  if (b.gambar_url) { document.getElementById('previewBerita').src = b.gambar_url; document.getElementById('previewBerita').classList.remove('hidden'); document.getElementById('placeholderBerita').classList.add('hidden'); }
+  else { document.getElementById('previewBerita').classList.add('hidden'); document.getElementById('placeholderBerita').classList.remove('hidden'); }
+  document.getElementById('beritaFormTitle').textContent = 'Edit Berita';
+  document.getElementById('btnBatalBerita').classList.remove('hidden');
+  document.getElementById('formBerita').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetFormBerita() {
+  document.getElementById('formBerita').reset();
+  document.getElementById('bId').value = '';
+  document.getElementById('previewBerita').classList.add('hidden');
+  document.getElementById('placeholderBerita').classList.remove('hidden');
+  document.getElementById('beritaFormTitle').textContent = 'Tambah Berita Baru';
+  document.getElementById('btnBatalBerita').classList.add('hidden');
+  pendingBeritaGambar = null;
+}
+async function handleSimpanBerita(e) {
+  e.preventDefault();
+  const id = document.getElementById('bId').value;
+  const btn = document.getElementById('btnSimpanBerita');
+  const label = btn.querySelector('span');
+  btn.disabled = true; const original = label.textContent; label.textContent = 'Menyimpan...';
+  try {
+    const payload = {
+      judul: document.getElementById('bJudul').value,
+      kategori: document.getElementById('bKategori').value,
+      tanggal: document.getElementById('bTanggal').value,
+      ringkasan: document.getElementById('bRingkasan').value,
+      isi_lengkap: document.getElementById('bIsiLengkap').value,
+    };
+    if (pendingBeritaGambar) payload.gambar = pendingBeritaGambar;
+    let res;
+    if (id) { payload.id = id; res = await postToApi('update_berita', payload); }
+    else { res = await postToApi('tambah_berita', payload); }
+    if (res.success) { showToast(id ? 'Berita berhasil diperbarui.' : 'Berita baru berhasil ditambahkan.', 'success'); resetFormBerita(); loadBeritaAdmin(); }
+    else showToast(res.error || 'Gagal menyimpan berita.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+  finally { btn.disabled = false; label.textContent = original; }
+}
+async function hapusBerita(id) {
+  if (!confirm('Hapus berita ini? Tindakan tidak dapat dibatalkan.')) return;
+  try {
+    const res = await postToApi('hapus_berita', { id });
+    if (res.success) { showToast('Berita berhasil dihapus.', 'success'); loadBeritaAdmin(); }
+    else showToast(res.error || 'Gagal menghapus berita.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+}
+
+/* ---------- PENGUMUMAN ---------- */
+async function loadPengumumanAdmin() {
+  document.getElementById('listPengumumanAdmin').innerHTML = loadingCard();
+  try {
+    const data = await getFromApi('pengumuman');
+    pengumumanList = (data.pengumuman || []).slice().sort((a, b) => new Date(b.tanggal) - new Date(a.tanggal));
+    renderPengumumanAdminList();
+  } catch (err) {
+    document.getElementById('listPengumumanAdmin').innerHTML = errorCard('Gagal memuat data pengumuman.');
+  }
+}
+function renderPengumumanAdminList() {
+  document.getElementById('pengumumanCount').textContent = pengumumanList.length;
+  const wrap = document.getElementById('listPengumumanAdmin');
+  if (!pengumumanList.length) { wrap.innerHTML = emptyCard('Belum ada pengumuman. Tambahkan lewat form di samping.'); return; }
+  wrap.innerHTML = pengumumanList.map(p => `
+    <div class="bg-white rounded-xl border border-slate-100 p-4 flex items-center gap-4">
+      <div class="w-12 h-12 rounded-lg bg-navy/10 flex items-center justify-center shrink-0"><i data-lucide="megaphone" class="w-5 h-5 text-navy"></i></div>
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-navy text-sm truncate">${escapeHtml(p.judul)}</p>
+        <p class="text-xs text-slate-400 truncate">${formatTanggalAdmin(p.tanggal)}${p.file_lampiran ? ' · ada lampiran' : ''}</p>
+      </div>
+      <button onclick="editPengumuman('${escapeHtml(String(p.id))}')" class="w-9 h-9 rounded-lg bg-navy/10 hover:bg-navy hover:text-white text-navy flex items-center justify-center shrink-0" aria-label="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+      <button onclick="hapusPengumuman('${escapeHtml(String(p.id))}')" class="w-9 h-9 rounded-lg bg-red-50 hover:bg-red-600 hover:text-white text-red-600 flex items-center justify-center shrink-0" aria-label="Hapus"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+    </div>`).join('');
+  lucide.createIcons();
+}
+function editPengumuman(id) {
+  const p = pengumumanList.find(x => String(x.id) === String(id));
+  if (!p) return;
+  document.getElementById('pmId').value = p.id;
+  document.getElementById('pmJudul').value = p.judul || '';
+  document.getElementById('pmTanggal').value = toDateInputValue(p.tanggal);
+  document.getElementById('pmIsi').value = p.isi || '';
+  pendingLampiran = null;
+  document.getElementById('lampiranLabel').textContent = p.file_lampiran ? 'Lampiran tersimpan (pilih file untuk ganti)' : 'Pilih File';
+  document.getElementById('pengumumanFormTitle').textContent = 'Edit Pengumuman';
+  document.getElementById('btnBatalPengumuman').classList.remove('hidden');
+  document.getElementById('formPengumuman').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetFormPengumuman() {
+  document.getElementById('formPengumuman').reset();
+  document.getElementById('pmId').value = '';
+  document.getElementById('lampiranLabel').textContent = 'Pilih File';
+  document.getElementById('pengumumanFormTitle').textContent = 'Tambah Pengumuman';
+  document.getElementById('btnBatalPengumuman').classList.add('hidden');
+  pendingLampiran = null;
+}
+async function handleSimpanPengumuman(e) {
+  e.preventDefault();
+  const id = document.getElementById('pmId').value;
+  const btn = document.getElementById('btnSimpanPengumuman');
+  const label = btn.querySelector('span');
+  btn.disabled = true; const original = label.textContent; label.textContent = 'Menyimpan...';
+  try {
+    const payload = {
+      judul: document.getElementById('pmJudul').value,
+      tanggal: document.getElementById('pmTanggal').value,
+      isi: document.getElementById('pmIsi').value,
+    };
+    if (pendingLampiran) { payload.lampiran = pendingLampiran.base64; payload.lampiran_nama = pendingLampiran.nama; payload.lampiran_mime = pendingLampiran.mime; }
+    let res;
+    if (id) { payload.id = id; res = await postToApi('update_pengumuman', payload); }
+    else { res = await postToApi('tambah_pengumuman', payload); }
+    if (res.success) { showToast(id ? 'Pengumuman berhasil diperbarui.' : 'Pengumuman baru berhasil ditambahkan.', 'success'); resetFormPengumuman(); loadPengumumanAdmin(); }
+    else showToast(res.error || 'Gagal menyimpan pengumuman.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+  finally { btn.disabled = false; label.textContent = original; }
+}
+async function hapusPengumuman(id) {
+  if (!confirm('Hapus pengumuman ini? Tindakan tidak dapat dibatalkan.')) return;
+  try {
+    const res = await postToApi('hapus_pengumuman', { id });
+    if (res.success) { showToast('Pengumuman berhasil dihapus.', 'success'); loadPengumumanAdmin(); }
+    else showToast(res.error || 'Gagal menghapus pengumuman.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+}
+
 /* ---------- DATA GURU ---------- */
 async function loadGuruAdmin() {
-  document.getElementById('listGuruAdmin').innerHTML = `<div class="text-center py-10 bg-white rounded-2xl border border-slate-100"><p class="text-sm text-slate-400">Memuat data...</p></div>`;
+  document.getElementById('listGuruAdmin').innerHTML = loadingCard();
   try {
     const data = await getFromApi('guru');
     guruList = data.guru || [];
     renderGuruAdminList();
   } catch (err) {
-    document.getElementById('listGuruAdmin').innerHTML = `<div class="text-center py-10 bg-red-50 border border-red-100 rounded-2xl"><p class="text-sm text-red-500">Gagal memuat data guru.</p></div>`;
+    document.getElementById('listGuruAdmin').innerHTML = errorCard('Gagal memuat data guru.');
   }
 }
-
 function renderGuruAdminList() {
   document.getElementById('guruCount').textContent = guruList.length;
   const wrap = document.getElementById('listGuruAdmin');
-  if (!guruList.length) {
-    wrap.innerHTML = `<div class="text-center py-10 bg-white rounded-2xl border border-dashed border-slate-200"><p class="text-sm text-slate-400">Belum ada data guru. Tambahkan lewat form di samping.</p></div>`;
-    return;
-  }
+  if (!guruList.length) { wrap.innerHTML = emptyCard('Belum ada data guru. Tambahkan lewat form di samping.'); return; }
   wrap.innerHTML = guruList.map(g => {
     const foto = g.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.nama || '?')}&background=1e3a8a&color=eab308&size=100`;
     const sub = [g.jabatan, g.mapel].filter(Boolean).map(escapeHtml).join(' · ');
@@ -442,7 +838,6 @@ function renderGuruAdminList() {
   }).join('');
   lucide.createIcons();
 }
-
 function editGuru(id) {
   const g = guruList.find(x => String(x.id) === String(id));
   if (!g) return;
@@ -452,19 +847,12 @@ function editGuru(id) {
   document.getElementById('gMapel').value = g.mapel || '';
   document.getElementById('gDeskripsi').value = g.deskripsi || '';
   pendingGuruFoto = null;
-  if (g.foto_url) {
-    document.getElementById('previewGuru').src = g.foto_url;
-    document.getElementById('previewGuru').classList.remove('hidden');
-    document.getElementById('placeholderGuru').classList.add('hidden');
-  } else {
-    document.getElementById('previewGuru').classList.add('hidden');
-    document.getElementById('placeholderGuru').classList.remove('hidden');
-  }
+  if (g.foto_url) { document.getElementById('previewGuru').src = g.foto_url; document.getElementById('previewGuru').classList.remove('hidden'); document.getElementById('placeholderGuru').classList.add('hidden'); }
+  else { document.getElementById('previewGuru').classList.add('hidden'); document.getElementById('placeholderGuru').classList.remove('hidden'); }
   document.getElementById('guruFormTitle').textContent = 'Edit Data Guru';
   document.getElementById('btnBatalGuru').classList.remove('hidden');
   document.getElementById('formGuru').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
 function resetFormGuru() {
   document.getElementById('formGuru').reset();
   document.getElementById('gId').value = '';
@@ -474,7 +862,6 @@ function resetFormGuru() {
   document.getElementById('btnBatalGuru').classList.add('hidden');
   pendingGuruFoto = null;
 }
-
 async function handleSimpanGuru(e) {
   e.preventDefault();
   const id = document.getElementById('gId').value;
@@ -507,7 +894,6 @@ async function handleSimpanGuru(e) {
     btn.disabled = false; label.textContent = original;
   }
 }
-
 async function hapusGuru(id) {
   if (!confirm('Hapus data guru ini? Tindakan tidak dapat dibatalkan.')) return;
   try {
@@ -520,6 +906,24 @@ async function hapusGuru(id) {
 }
 
 /* ---------- HELPERS ---------- */
+function loadingCard() { return `<div class="text-center py-10 bg-white rounded-2xl border border-slate-100"><p class="text-sm text-slate-400">Memuat data...</p></div>`; }
+function errorCard(msg) { return `<div class="text-center py-10 bg-red-50 border border-red-100 rounded-2xl"><p class="text-sm text-red-500">${msg}</p></div>`; }
+function emptyCard(msg) { return `<div class="text-center py-10 bg-white rounded-2xl border border-dashed border-slate-200"><p class="text-sm text-slate-400">${msg}</p></div>`; }
+
+function toDateInputValue(val) {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d)) return '';
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+}
+function formatTanggalAdmin(val) {
+  if (!val) return '';
+  const d = new Date(val);
+  if (isNaN(d)) return String(val);
+  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
 function showToast(msg, type) {
   const el = document.getElementById('toast');
   el.textContent = msg;
