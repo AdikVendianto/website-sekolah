@@ -190,6 +190,27 @@
   </div>
 </section>
 
+<!-- ======================= GALERI SEKOLAH (Slideshow) ======================= -->
+<section id="galeri-section" class="hidden max-w-7xl mx-auto px-4 sm:px-6 pb-16 sm:pb-20">
+  <div class="text-center max-w-2xl mx-auto mb-10">
+    <p class="eyebrow text-gold-dark font-bold text-xs sm:text-sm mb-2">GALERI SEKOLAH</p>
+    <h2 class="text-2xl sm:text-3xl font-extrabold text-navy">Momen di Sekolah Kami</h2>
+  </div>
+
+  <div id="galeri-carousel" class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-100">
+    <div id="galeri-track" class="flex transition-transform duration-500 ease-out"></div>
+
+    <button onclick="galeriPrev()" aria-label="Foto sebelumnya" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/85 hover:bg-white text-navy flex items-center justify-center shadow-lg">
+      <i data-lucide="chevron-left" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+    </button>
+    <button onclick="galeriNext()" aria-label="Foto berikutnya" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/85 hover:bg-white text-navy flex items-center justify-center shadow-lg">
+      <i data-lucide="chevron-right" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+    </button>
+
+    <div id="galeri-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2"></div>
+  </div>
+</section>
+
 <!-- ======================= SAMBUTAN KEPALA SEKOLAH (Signature Section) ======================= -->
 <section class="bg-navy relative overflow-hidden">
   <div class="absolute inset-0 dot-grid opacity-20" style="background-image: radial-gradient(circle, rgba(255,255,255,0.25) 1.5px, transparent 1.5px);"></div>
@@ -568,7 +589,7 @@
    ============================================================ */
 const API_URL = 'https://script.google.com/macros/s/AKfycbyX1pP56Qd_36Km9Uqx6um-ywfq7vRYzR4wXDzMg13uhGn2xxME1u3Hvj4bdNTuodS9/exec';
 
-let DATA = { berita: [], pengumuman: [], guru: [], profil: {} };
+let DATA = { berita: [], pengumuman: [], guru: [], galeri: [], profil: {} };
 
 /* ---------- INIT ---------- */
 document.addEventListener('DOMContentLoaded', () => {
@@ -594,19 +615,28 @@ async function loadData() {
     DATA.berita = json.data.berita || [];
     DATA.pengumuman = json.data.pengumuman || [];
     DATA.guru = json.data.guru || [];
+    DATA.galeri = json.data.galeri || [];
     DATA.profil = json.data.profil || {};
 
-    renderProfil();
-    renderKonten();
-    renderBeritaPreview();
-    renderGuru();
-    renderBeritaFull();
-    renderPengumuman();
-    animateStats();
+    safeRender(renderProfil);
+    safeRender(renderKonten);
+    safeRender(renderGaleri);
+    safeRender(renderBeritaPreview);
+    safeRender(renderGuru);
+    safeRender(renderBeritaFull);
+    safeRender(renderPengumuman);
+    safeRender(animateStats);
   } catch (err) {
     console.error(err);
     showErrorState();
   }
+}
+
+/* Menjalankan satu fungsi render dengan pengaman: kalau satu bagian gagal
+   karena bug tak terduga, bagian lain tetap lanjut tampil alih-alih ikut
+   dianggap "gagal memuat data" secara keseluruhan. */
+function safeRender(fn) {
+  try { fn(); } catch (err) { console.error('Gagal merender ' + fn.name + ':', err); }
 }
 
 function showSetupNotice() {
@@ -718,6 +748,73 @@ function renderListIfExists(id, raw, itemFn) {
   const el = document.getElementById(id);
   if (!el) return;
   el.innerHTML = items.map((item, idx) => itemFn(item, idx)).join('');
+}
+
+/* ---------- RENDER: GALERI SEKOLAH (Slideshow) ---------- */
+let galeriPhotos = [];
+let galeriIndex = 0;
+let galeriTimer = null;
+
+function renderGaleri() {
+  galeriPhotos = Array.isArray(DATA.galeri) ? DATA.galeri : [];
+  const section = document.getElementById('galeri-section');
+  if (!galeriPhotos.length) { section.classList.add('hidden'); return; }
+  section.classList.remove('hidden');
+
+  const track = document.getElementById('galeri-track');
+  track.innerHTML = galeriPhotos.map(g => `
+    <div class="min-w-full shrink-0 relative">
+      <img src="${escapeHtml(g.gambar_url)}" alt="${escapeHtml(g.keterangan || 'Foto sekolah')}" class="w-full h-[260px] sm:h-[400px] lg:h-[500px] object-cover">
+      ${g.keterangan ? `<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent p-5 sm:p-8 pt-14"><p class="text-white font-semibold text-sm sm:text-base">${escapeHtml(g.keterangan)}</p></div>` : ''}
+    </div>`).join('');
+
+  const dots = document.getElementById('galeri-dots');
+  dots.innerHTML = galeriPhotos.length > 1
+    ? galeriPhotos.map((_, i) => `<button onclick="galeriGoTo(${i})" aria-label="Ke foto ${i + 1}" class="galeri-dot h-2.5 rounded-full transition-all"></button>`).join('')
+    : '';
+
+  galeriIndex = 0;
+  updateGaleriView();
+  setupGaleriGestures();
+  if (galeriPhotos.length > 1) startGaleriAutoplay();
+  lucide.createIcons();
+}
+
+function updateGaleriView() {
+  const track = document.getElementById('galeri-track');
+  if (track) track.style.transform = `translateX(-${galeriIndex * 100}%)`;
+  document.querySelectorAll('.galeri-dot').forEach((dot, i) => {
+    const active = i === galeriIndex;
+    dot.classList.toggle('w-6', active);
+    dot.classList.toggle('w-2.5', !active);
+    dot.classList.toggle('bg-gold', active);
+    dot.classList.toggle('bg-white/60', !active);
+  });
+}
+function galeriNext() { if (!galeriPhotos.length) return; galeriIndex = (galeriIndex + 1) % galeriPhotos.length; updateGaleriView(); resetGaleriAutoplay(); }
+function galeriPrev() { if (!galeriPhotos.length) return; galeriIndex = (galeriIndex - 1 + galeriPhotos.length) % galeriPhotos.length; updateGaleriView(); resetGaleriAutoplay(); }
+function galeriGoTo(i) { galeriIndex = i; updateGaleriView(); resetGaleriAutoplay(); }
+
+function startGaleriAutoplay() { stopGaleriAutoplay(); galeriTimer = setInterval(galeriNext, 5000); }
+function stopGaleriAutoplay() { if (galeriTimer) { clearInterval(galeriTimer); galeriTimer = null; } }
+function resetGaleriAutoplay() { if (galeriPhotos.length > 1) startGaleriAutoplay(); }
+
+let galeriGesturesReady = false;
+function setupGaleriGestures() {
+  if (galeriGesturesReady) return; // pasang listener sekali saja
+  galeriGesturesReady = true;
+  const carousel = document.getElementById('galeri-carousel');
+  if (!carousel) return;
+  carousel.addEventListener('mouseenter', stopGaleriAutoplay);
+  carousel.addEventListener('mouseleave', resetGaleriAutoplay);
+
+  let touchStartX = 0;
+  carousel.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; stopGaleriAutoplay(); }, { passive: true });
+  carousel.addEventListener('touchend', e => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) { diff > 0 ? galeriNext() : galeriPrev(); }
+    else resetGaleriAutoplay();
+  }, { passive: true });
 }
 
 /* ---------- RENDER: GURU ---------- */
