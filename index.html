@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SD N 02 PULOSARI</title>
-<meta name="description" content="Website resmi SD N 02 PULOSARI — profil sekolah, berita, PPDB, dan informasi kontak.">
+<title>SD Negeri Harapan Bangsa 01</title>
+<meta name="description" content="Website resmi SD Negeri Harapan Bangsa 01 — profil sekolah, berita, PPDB, dan informasi kontak.">
 
 <!-- Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -77,6 +77,16 @@
 </head>
 
 <body class="bg-white text-slate-800 antialiased">
+
+<!-- ======================= LOADING OVERLAY ======================= -->
+<!-- Menutupi seluruh halaman sampai data asli dari GAS selesai dimuat, supaya nama/nomor bawaan (default) di HTML tidak sempat terlihat sekilas. Otomatis hilang begitu data siap, atau maksimal 8 detik (jaga-jaga kalau koneksi lambat). -->
+<div id="pageLoader" class="fixed inset-0 z-[100] bg-white flex flex-col items-center justify-center gap-5 transition-opacity duration-300">
+  <div class="w-14 h-14 rounded-full bg-navy flex items-center justify-center">
+    <i data-lucide="graduation-cap" class="w-7 h-7 text-gold"></i>
+  </div>
+  <div class="w-9 h-9 border-[3px] border-navy/15 border-t-navy rounded-full animate-spin"></div>
+  <span class="sr-only">Memuat website...</span>
+</div>
 
 <!-- ======================= TOP BAR ======================= -->
 <div class="bg-navy text-white text-xs sm:text-sm">
@@ -591,6 +601,21 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbyX1pP56Qd_36Km9Uqx6um-
 
 let DATA = { berita: [], pengumuman: [], guru: [], galeri: [], profil: {} };
 
+/* ---------- LOADING OVERLAY ---------- */
+let loaderHidden = false;
+function hidePageLoader() {
+  if (loaderHidden) return;
+  loaderHidden = true;
+  const loader = document.getElementById('pageLoader');
+  if (!loader) return;
+  loader.style.pointerEvents = 'none';
+  loader.style.opacity = '0';
+  setTimeout(() => loader.remove(), 300);
+}
+// Jaring pengaman: kalau karena suatu sebab loadData() tidak pernah selesai
+// (mis. koneksi sangat lambat), jangan biarkan pengunjung terjebak di layar loading selamanya.
+setTimeout(hidePageLoader, 8000);
+
 /* ---------- INIT ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
@@ -626,6 +651,7 @@ async function loadData() {
     safeRender(renderBeritaFull);
     safeRender(renderPengumuman);
     safeRender(animateStats);
+    hidePageLoader();
   } catch (err) {
     console.error(err);
     showErrorState();
@@ -647,6 +673,7 @@ function showSetupNotice() {
   ['berita-preview-grid','guru-grid','panelBerita'].forEach(id => document.getElementById(id).innerHTML = msg);
   document.getElementById('panelPengumuman').innerHTML = msg;
   animateStats();
+  hidePageLoader();
 }
 
 function showErrorState() {
@@ -657,6 +684,7 @@ function showErrorState() {
   ['berita-preview-grid','guru-grid','panelBerita'].forEach(id => document.getElementById(id).innerHTML = msg);
   document.getElementById('panelPengumuman').innerHTML = msg;
   animateStats();
+  hidePageLoader();
 }
 
 /* ---------- RENDER: PROFIL SEKOLAH (identitas, kontak, statistik) ---------- */
