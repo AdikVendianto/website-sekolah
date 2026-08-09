@@ -154,6 +154,14 @@
             </div>
             <div><label class="field-label">Email Sekolah</label><input type="email" id="pEmail" class="field-input" placeholder="info@sdharapanbangsa.sch.id"></div>
             <div>
+              <label class="field-label">Media Sosial (opsional — kosongkan jika belum ada, link otomatis disembunyikan di website)</label>
+              <div class="grid sm:grid-cols-3 gap-3">
+                <input type="url" id="pSosmedFacebook" class="field-input" placeholder="Link Facebook">
+                <input type="url" id="pSosmedInstagram" class="field-input" placeholder="Link Instagram">
+                <input type="url" id="pSosmedYoutube" class="field-input" placeholder="Link YouTube">
+              </div>
+            </div>
+            <div>
               <label class="field-label">Sambutan Kepala Sekolah</label>
               <textarea id="pSambutan" rows="5" class="field-input" placeholder="Tulis pesan sambutan yang akan tampil di beranda website..."></textarea>
             </div>
@@ -566,6 +574,9 @@ async function loadProfilAdmin() {
     document.getElementById('pTelepon').value = profilData.telepon || '';
     document.getElementById('pWhatsapp').value = profilData.whatsapp || '';
     document.getElementById('pEmail').value = profilData.email || '';
+    document.getElementById('pSosmedFacebook').value = profilData.sosmed_facebook || '';
+    document.getElementById('pSosmedInstagram').value = profilData.sosmed_instagram || '';
+    document.getElementById('pSosmedYoutube').value = profilData.sosmed_youtube || '';
     document.getElementById('pSambutan').value = profilData.sambutan_kepala_sekolah || '';
     document.getElementById('pJumlahSiswa').value = profilData.jumlah_siswa || '';
     document.getElementById('pJumlahKelas').value = profilData.jumlah_kelas || '';
@@ -601,6 +612,9 @@ async function handleSimpanProfil(e) {
       telepon: document.getElementById('pTelepon').value,
       whatsapp: document.getElementById('pWhatsapp').value,
       email: document.getElementById('pEmail').value,
+      sosmed_facebook: document.getElementById('pSosmedFacebook').value,
+      sosmed_instagram: document.getElementById('pSosmedInstagram').value,
+      sosmed_youtube: document.getElementById('pSosmedYoutube').value,
       sambutan_kepala_sekolah: document.getElementById('pSambutan').value,
       jumlah_siswa: document.getElementById('pJumlahSiswa').value,
       jumlah_kelas: document.getElementById('pJumlahKelas').value,
