@@ -500,9 +500,9 @@
       </div>
 
       <div class="flex gap-3 pt-2">
-        <a href="#" class="px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Facebook</a>
-        <a href="#" class="px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Instagram</a>
-        <a href="#" class="px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">YouTube</a>
+        <a href="#" id="kontak-sosmed-fb" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Facebook</a>
+        <a href="#" id="kontak-sosmed-ig" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Instagram</a>
+        <a href="#" id="kontak-sosmed-yt" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">YouTube</a>
       </div>
 
       <iframe id="map-iframe" class="w-full h-56 rounded-2xl border border-slate-100 mt-4" loading="lazy" src="https://maps.google.com/maps?q=Surakarta%2C%20Jawa%20Tengah&output=embed"></iframe>
@@ -564,9 +564,9 @@
     <div>
       <p class="font-semibold text-white mb-4 text-sm">Ikuti Kami</p>
       <div class="flex gap-2">
-        <a href="#" class="px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">FB</a>
-        <a href="#" class="px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">IG</a>
-        <a href="#" class="px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">YT</a>
+        <a href="#" id="footer-sosmed-fb" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">FB</a>
+        <a href="#" id="footer-sosmed-ig" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">IG</a>
+        <a href="#" id="footer-sosmed-yt" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">YT</a>
       </div>
     </div>
   </div>
@@ -726,7 +726,30 @@ function renderProfil() {
   if (p.jumlah_prestasi) document.getElementById('stat-prestasi').dataset.target = p.jumlah_prestasi;
   document.getElementById('stat-guru').dataset.target = DATA.guru.length || 0;
 
+  setSosmedLink('kontak-sosmed-fb', p.sosmed_facebook);
+  setSosmedLink('kontak-sosmed-ig', p.sosmed_instagram);
+  setSosmedLink('kontak-sosmed-yt', p.sosmed_youtube);
+  setSosmedLink('footer-sosmed-fb', p.sosmed_facebook);
+  setSosmedLink('footer-sosmed-ig', p.sosmed_instagram);
+  setSosmedLink('footer-sosmed-yt', p.sosmed_youtube);
+
   if (alamat) document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(alamat)}&output=embed`;
+}
+
+/* Menampilkan link media sosial hanya jika sudah diisi admin, dan otomatis
+   menambahkan https:// kalau admin lupa mengetiknya saat mengisi form. */
+function setSosmedLink(id, url) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const trimmed = url ? String(url).trim() : '';
+  if (trimmed) {
+    el.href = /^https?:\/\//i.test(trimmed) ? trimmed : 'https://' + trimmed;
+    el.target = '_blank';
+    el.rel = 'noopener';
+    el.classList.remove('hidden');
+  } else {
+    el.classList.add('hidden');
+  }
 }
 
 /* ---------- RENDER: KONTEN HALAMAN (Beranda, Profil, Akademik, PPDB) ----------
