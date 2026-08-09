@@ -91,6 +91,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex gap-2 pb-3 overflow-x-auto">
       <button onclick="switchAdminTab('profil')" id="atbProfil" class="atb active px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Profil Sekolah</button>
       <button onclick="switchAdminTab('konten')" id="atbKonten" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Konten Website</button>
+      <button onclick="switchAdminTab('galeri')" id="atbGaleri" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Galeri</button>
       <button onclick="switchAdminTab('berita')" id="atbBerita" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Berita</button>
       <button onclick="switchAdminTab('pengumuman')" id="atbPengumuman" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Pengumuman</button>
       <button onclick="switchAdminTab('guru')" id="atbGuru" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Data Guru</button>
@@ -233,6 +234,43 @@
       </form>
     </section>
 
+    <!-- ============ PANEL: GALERI ============ -->
+    <section id="panelGaleriAdmin" class="hidden">
+      <p class="text-sm text-slate-500 mb-5">Foto di sini tampil sebagai slide show otomatis di Beranda website. Kosongkan semua foto untuk menyembunyikan bagian ini dari website.</p>
+      <div class="grid lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-100 p-6 sm:p-7 h-fit">
+          <p class="font-bold text-navy text-sm mb-1" id="galeriFormTitle">Tambah Foto Galeri</p>
+          <p class="text-xs text-slate-400 mb-5">Tampil sebagai slide show di Beranda</p>
+          <form id="formGaleri" class="space-y-4">
+            <input type="hidden" id="glId">
+            <div class="flex flex-col items-center mb-2">
+              <img id="previewGaleri" src="" alt="" class="w-full h-32 rounded-xl object-cover border-4 border-cloud hidden">
+              <div id="placeholderGaleri" class="w-full h-32 rounded-xl bg-cloud border-4 border-slate-100 flex items-center justify-center">
+                <i data-lucide="image" class="w-7 h-7 text-slate-300"></i>
+              </div>
+              <label class="mt-3 cursor-pointer text-xs font-bold text-navy bg-navy/10 hover:bg-navy hover:text-white px-4 py-2 rounded-full flex items-center gap-1.5">
+                <i data-lucide="upload" class="w-3.5 h-3.5"></i>Pilih Foto
+                <input type="file" accept="image/*" class="hidden" id="inputGaleri" onchange="handleImagePreview(this,'previewGaleri','placeholderGaleri','galeri')">
+              </label>
+            </div>
+            <div><label class="field-label">Keterangan (opsional)</label><input id="glKeterangan" class="field-input" placeholder="Contoh: Kegiatan Pramuka 2026"></div>
+            <div class="flex gap-2 pt-1">
+              <button type="submit" id="btnSimpanGaleri" class="flex-1 bg-navy hover:bg-navy-dark text-white font-bold px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 text-sm"><span>Simpan</span><i data-lucide="save" class="w-4 h-4"></i></button>
+              <button type="button" id="btnBatalGaleri" onclick="resetFormGaleri()" class="hidden px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 font-semibold text-sm hover:bg-slate-50">Batal</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="lg:col-span-2">
+          <div class="flex items-center justify-between mb-4">
+            <p class="font-bold text-navy text-sm">Foto di Galeri (<span id="galeriCount">0</span>)</p>
+            <button onclick="loadGaleriAdmin()" class="text-xs font-semibold text-navy flex items-center gap-1 hover:text-gold-dark"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>Muat Ulang</button>
+          </div>
+          <div id="listGaleriAdmin" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ PANEL: BERITA ============ -->
     <section id="panelBeritaAdmin" class="hidden">
       <div class="grid lg:grid-cols-3 gap-6">
@@ -365,20 +403,23 @@ let session = { password: null };
 let guruList = [];
 let beritaList = [];
 let pengumumanList = [];
+let galeriList = [];
 let profilData = {};
 let pendingLogo = null;
 let pendingKepsek = null;
 let pendingGuruFoto = null;
 let pendingBeritaGambar = null;
+let pendingGaleriFoto = null;
 let pendingLampiran = null; // { base64, nama, mime }
 
-const ADMIN_TABS = ['profil', 'konten', 'berita', 'pengumuman', 'guru'];
+const ADMIN_TABS = ['profil', 'konten', 'galeri', 'berita', 'pengumuman', 'guru'];
 
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
   document.getElementById('loginForm').addEventListener('submit', handleLogin);
   document.getElementById('formProfil').addEventListener('submit', handleSimpanProfil);
   document.getElementById('formKonten').addEventListener('submit', handleSimpanKonten);
+  document.getElementById('formGaleri').addEventListener('submit', handleSimpanGaleri);
   document.getElementById('formGuru').addEventListener('submit', handleSimpanGuru);
   document.getElementById('formBerita').addEventListener('submit', handleSimpanBerita);
   document.getElementById('formPengumuman').addEventListener('submit', handleSimpanPengumuman);
@@ -409,6 +450,7 @@ async function handleLogin(e) {
       loadGuruAdmin();
       loadBeritaAdmin();
       loadPengumumanAdmin();
+      loadGaleriAdmin();
     } else {
       errEl.textContent = 'Password salah. Silakan coba lagi.';
       errEl.classList.remove('hidden');
@@ -462,6 +504,7 @@ function handleImagePreview(input, previewId, placeholderId, target) {
     if (target === 'kepsek') pendingKepsek = base64;
     if (target === 'guru') pendingGuruFoto = base64;
     if (target === 'berita') pendingBeritaGambar = base64;
+    if (target === 'galeri') pendingGaleriFoto = base64;
   }).catch(() => showToast('Gagal memproses gambar. Coba file lain.', 'error'));
 }
 
@@ -804,6 +847,79 @@ async function hapusPengumuman(id) {
     const res = await postToApi('hapus_pengumuman', { id });
     if (res.success) { showToast('Pengumuman berhasil dihapus.', 'success'); loadPengumumanAdmin(); }
     else showToast(res.error || 'Gagal menghapus pengumuman.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+}
+
+/* ---------- GALERI ---------- */
+async function loadGaleriAdmin() {
+  document.getElementById('listGaleriAdmin').innerHTML = loadingCard();
+  try {
+    const data = await getFromApi('galeri');
+    galeriList = data.galeri || [];
+    renderGaleriAdminList();
+  } catch (err) {
+    document.getElementById('listGaleriAdmin').innerHTML = errorCard('Gagal memuat data galeri.');
+  }
+}
+function renderGaleriAdminList() {
+  document.getElementById('galeriCount').textContent = galeriList.length;
+  const wrap = document.getElementById('listGaleriAdmin');
+  if (!galeriList.length) { wrap.innerHTML = `<div class="col-span-full">${emptyCard('Belum ada foto. Tambahkan lewat form di samping.')}</div>`; return; }
+  wrap.innerHTML = galeriList.map(g => `
+    <div class="relative rounded-xl overflow-hidden border border-slate-100 bg-white">
+      <img src="${escapeHtml(g.gambar_url)}" alt="" class="w-full h-28 object-cover">
+      ${g.keterangan ? `<p class="text-[11px] text-slate-500 px-2 py-1.5 truncate">${escapeHtml(g.keterangan)}</p>` : ''}
+      <div class="absolute top-1.5 right-1.5 flex gap-1">
+        <button onclick="editGaleri('${escapeHtml(String(g.id))}')" class="w-7 h-7 rounded-lg bg-white/90 hover:bg-navy hover:text-white text-navy flex items-center justify-center shadow" aria-label="Edit"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
+        <button onclick="hapusGaleri('${escapeHtml(String(g.id))}')" class="w-7 h-7 rounded-lg bg-white/90 hover:bg-red-600 hover:text-white text-red-600 flex items-center justify-center shadow" aria-label="Hapus"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+      </div>
+    </div>`).join('');
+  lucide.createIcons();
+}
+function editGaleri(id) {
+  const g = galeriList.find(x => String(x.id) === String(id));
+  if (!g) return;
+  document.getElementById('glId').value = g.id;
+  document.getElementById('glKeterangan').value = g.keterangan || '';
+  pendingGaleriFoto = null;
+  if (g.gambar_url) { document.getElementById('previewGaleri').src = g.gambar_url; document.getElementById('previewGaleri').classList.remove('hidden'); document.getElementById('placeholderGaleri').classList.add('hidden'); }
+  document.getElementById('galeriFormTitle').textContent = 'Edit Foto Galeri';
+  document.getElementById('btnBatalGaleri').classList.remove('hidden');
+  document.getElementById('formGaleri').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function resetFormGaleri() {
+  document.getElementById('formGaleri').reset();
+  document.getElementById('glId').value = '';
+  document.getElementById('previewGaleri').classList.add('hidden');
+  document.getElementById('placeholderGaleri').classList.remove('hidden');
+  document.getElementById('galeriFormTitle').textContent = 'Tambah Foto Galeri';
+  document.getElementById('btnBatalGaleri').classList.add('hidden');
+  pendingGaleriFoto = null;
+}
+async function handleSimpanGaleri(e) {
+  e.preventDefault();
+  const id = document.getElementById('glId').value;
+  if (!id && !pendingGaleriFoto) { showToast('Pilih foto terlebih dahulu.', 'error'); return; }
+  const btn = document.getElementById('btnSimpanGaleri');
+  const label = btn.querySelector('span');
+  btn.disabled = true; const original = label.textContent; label.textContent = 'Menyimpan...';
+  try {
+    const payload = { keterangan: document.getElementById('glKeterangan').value };
+    if (pendingGaleriFoto) payload.gambar = pendingGaleriFoto;
+    let res;
+    if (id) { payload.id = id; res = await postToApi('update_galeri', payload); }
+    else { res = await postToApi('tambah_galeri', payload); }
+    if (res.success) { showToast(id ? 'Foto berhasil diperbarui.' : 'Foto berhasil ditambahkan.', 'success'); resetFormGaleri(); loadGaleriAdmin(); }
+    else showToast(res.error || 'Gagal menyimpan foto.', 'error');
+  } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
+  finally { btn.disabled = false; label.textContent = original; }
+}
+async function hapusGaleri(id) {
+  if (!confirm('Hapus foto ini dari galeri? Tindakan tidak dapat dibatalkan.')) return;
+  try {
+    const res = await postToApi('hapus_galeri', { id });
+    if (res.success) { showToast('Foto berhasil dihapus.', 'success'); loadGaleriAdmin(); }
+    else showToast(res.error || 'Gagal menghapus foto.', 'error');
   } catch (err) { showToast('Terjadi kesalahan koneksi ke server.', 'error'); }
 }
 
