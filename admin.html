@@ -41,6 +41,7 @@
   details > summary::-webkit-details-marker { display: none; }
   details summary .chev { transition: transform 0.2s ease; }
   details[open] summary .chev { transform: rotate(90deg); }
+  .tema-card { transition: border-color 0.15s ease, box-shadow 0.15s ease; }
   @media (prefers-reduced-motion: reduce) { *, .transition { transition: none !important; } }
 </style>
 </head>
@@ -91,6 +92,7 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 flex gap-2 pb-3 overflow-x-auto">
       <button onclick="switchAdminTab('profil')" id="atbProfil" class="atb active px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Profil Sekolah</button>
       <button onclick="switchAdminTab('konten')" id="atbKonten" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Konten Website</button>
+      <button onclick="switchAdminTab('tema')" id="atbTema" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Tema Website</button>
       <button onclick="switchAdminTab('galeri')" id="atbGaleri" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Galeri</button>
       <button onclick="switchAdminTab('berita')" id="atbBerita" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Berita</button>
       <button onclick="switchAdminTab('pengumuman')" id="atbPengumuman" class="atb px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap">Pengumuman</button>
@@ -155,9 +157,10 @@
             <div><label class="field-label">Email Sekolah</label><input type="email" id="pEmail" class="field-input" placeholder="info@sdharapanbangsa.sch.id"></div>
             <div>
               <label class="field-label">Media Sosial (opsional — kosongkan jika belum ada, link otomatis disembunyikan di website)</label>
-              <div class="grid sm:grid-cols-3 gap-3">
+              <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <input type="url" id="pSosmedFacebook" class="field-input" placeholder="Link Facebook">
                 <input type="url" id="pSosmedInstagram" class="field-input" placeholder="Link Instagram">
+                <input type="url" id="pSosmedTiktok" class="field-input" placeholder="Link TikTok">
                 <input type="url" id="pSosmedYoutube" class="field-input" placeholder="Link YouTube">
               </div>
             </div>
@@ -240,6 +243,39 @@
           <span>Simpan Semua Konten</span><i data-lucide="save" class="w-4 h-4"></i>
         </button>
       </form>
+    </section>
+
+    <!-- ============ PANEL: TEMA WEBSITE ============ -->
+    <section id="panelTemaAdmin" class="hidden">
+      <p class="text-sm text-slate-500 mb-5">Pilih salah satu tema warna siap pakai, atau buat kombinasi warna sendiri. Perubahan berlaku untuk seluruh halaman website begitu disimpan.</p>
+      <div class="bg-white rounded-2xl border border-slate-100 p-6 sm:p-7">
+        <div id="temaPresetGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <div id="temaCustomPicker" class="hidden mt-5 p-5 bg-cloud rounded-xl">
+          <p class="font-semibold text-navy text-sm mb-4">Warna Kustom</p>
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label">Warna Utama (navbar, tombol, judul)</label>
+              <div class="flex items-center gap-3">
+                <input type="color" id="temaCustomPrimer" value="#1e3a8a" class="w-12 h-10 rounded-lg border border-slate-200 cursor-pointer shrink-0">
+                <input type="text" id="temaCustomPrimerHex" class="field-input" placeholder="#1e3a8a">
+              </div>
+            </div>
+            <div>
+              <label class="field-label">Warna Aksen (tombol utama, highlight)</label>
+              <div class="flex items-center gap-3">
+                <input type="color" id="temaCustomAksen" value="#eab308" class="w-12 h-10 rounded-lg border border-slate-200 cursor-pointer shrink-0">
+                <input type="text" id="temaCustomAksenHex" class="field-input" placeholder="#eab308">
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-3">Varian gelap/terang untuk tiap warna dibuat otomatis oleh sistem.</p>
+        </div>
+
+        <button onclick="handleSimpanTema()" id="btnSimpanTema" class="mt-6 bg-navy hover:bg-navy-dark text-white font-bold px-7 py-3 rounded-xl flex items-center justify-center gap-2">
+          <span>Simpan Tema</span><i data-lucide="save" class="w-4 h-4"></i>
+        </button>
+      </div>
     </section>
 
     <!-- ============ PANEL: GALERI ============ -->
@@ -420,7 +456,7 @@ let pendingBeritaGambar = null;
 let pendingGaleriFoto = null;
 let pendingLampiran = null; // { base64, nama, mime }
 
-const ADMIN_TABS = ['profil', 'konten', 'galeri', 'berita', 'pengumuman', 'guru'];
+const ADMIN_TABS = ['profil', 'konten', 'tema', 'galeri', 'berita', 'pengumuman', 'guru'];
 
 document.addEventListener('DOMContentLoaded', () => {
   lucide.createIcons();
@@ -431,6 +467,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('formGuru').addEventListener('submit', handleSimpanGuru);
   document.getElementById('formBerita').addEventListener('submit', handleSimpanBerita);
   document.getElementById('formPengumuman').addEventListener('submit', handleSimpanPengumuman);
+  setupColorSync('temaCustomPrimer', 'temaCustomPrimerHex');
+  setupColorSync('temaCustomAksen', 'temaCustomAksenHex');
 });
 
 /* ---------- AUTH ---------- */
@@ -454,7 +492,7 @@ async function handleLogin(e) {
       session.password = pw;
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('dashboard').classList.remove('hidden');
-      loadProfilAdmin().then(loadKontenAdmin);
+      loadProfilAdmin().then(loadKontenAdmin).then(loadTemaAdmin);
       loadGuruAdmin();
       loadBeritaAdmin();
       loadPengumumanAdmin();
@@ -576,6 +614,7 @@ async function loadProfilAdmin() {
     document.getElementById('pEmail').value = profilData.email || '';
     document.getElementById('pSosmedFacebook').value = profilData.sosmed_facebook || '';
     document.getElementById('pSosmedInstagram').value = profilData.sosmed_instagram || '';
+    document.getElementById('pSosmedTiktok').value = profilData.sosmed_tiktok || '';
     document.getElementById('pSosmedYoutube').value = profilData.sosmed_youtube || '';
     document.getElementById('pSambutan').value = profilData.sambutan_kepala_sekolah || '';
     document.getElementById('pJumlahSiswa').value = profilData.jumlah_siswa || '';
@@ -614,6 +653,7 @@ async function handleSimpanProfil(e) {
       email: document.getElementById('pEmail').value,
       sosmed_facebook: document.getElementById('pSosmedFacebook').value,
       sosmed_instagram: document.getElementById('pSosmedInstagram').value,
+      sosmed_tiktok: document.getElementById('pSosmedTiktok').value,
       sosmed_youtube: document.getElementById('pSosmedYoutube').value,
       sambutan_kepala_sekolah: document.getElementById('pSambutan').value,
       jumlah_siswa: document.getElementById('pJumlahSiswa').value,
@@ -691,6 +731,97 @@ async function handleSimpanKonten(e) {
       loadKontenAdmin();
     } else {
       showToast(res.error || 'Gagal menyimpan konten.', 'error');
+    }
+  } catch (err) {
+    showToast('Terjadi kesalahan koneksi ke server.', 'error');
+  } finally {
+    btn.disabled = false; label.textContent = original;
+  }
+}
+
+/* ---------- TEMA WEBSITE ---------- */
+const TEMA_PRESETS_LIST = [
+  { key: 'navy-gold',   label: 'Navy & Gold',          primer: '#1e3a8a', aksen: '#eab308' },
+  { key: 'hijau-krem',  label: 'Hijau & Krem',          primer: '#14532d', aksen: '#d97706' },
+  { key: 'marun-krem',  label: 'Merah Marun & Krem',    primer: '#7f1d1d', aksen: '#eab308' },
+  { key: 'biru-oranye', label: 'Biru Laut & Oranye',    primer: '#0c4a6e', aksen: '#f97316' },
+  { key: 'ungu-gold',   label: 'Ungu & Gold',           primer: '#4c1d95', aksen: '#eab308' },
+];
+let temaTerpilih = 'navy-gold';
+
+function renderTemaPresetGrid() {
+  const grid = document.getElementById('temaPresetGrid');
+  const kartuPreset = TEMA_PRESETS_LIST.map(t => `
+    <button type="button" onclick="pilihTema('${t.key}')" data-tema="${t.key}" class="tema-card text-left p-4 rounded-xl border-2 border-slate-200 hover:border-navy">
+      <div class="flex gap-1.5 mb-3">
+        <div class="w-8 h-8 rounded-full border border-black/10" style="background:${t.primer}"></div>
+        <div class="w-8 h-8 rounded-full border border-black/10" style="background:${t.aksen}"></div>
+      </div>
+      <p class="font-semibold text-sm text-navy">${t.label}</p>
+    </button>`).join('');
+  const kartuCustom = `
+    <button type="button" onclick="pilihTema('custom')" data-tema="custom" class="tema-card text-left p-4 rounded-xl border-2 border-slate-200 hover:border-navy">
+      <div class="flex gap-1.5 mb-3">
+        <div class="w-8 h-8 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center"><i data-lucide="palette" class="w-4 h-4 text-slate-400"></i></div>
+      </div>
+      <p class="font-semibold text-sm text-navy">Warna Kustom</p>
+    </button>`;
+  grid.innerHTML = kartuPreset + kartuCustom;
+  lucide.createIcons();
+  updateTemaCardSelection();
+}
+
+function pilihTema(key) {
+  temaTerpilih = key;
+  updateTemaCardSelection();
+  document.getElementById('temaCustomPicker').classList.toggle('hidden', key !== 'custom');
+}
+
+function updateTemaCardSelection() {
+  document.querySelectorAll('.tema-card').forEach(card => {
+    const aktif = card.dataset.tema === temaTerpilih;
+    card.classList.toggle('border-navy', aktif);
+    card.classList.toggle('ring-2', aktif);
+    card.classList.toggle('ring-navy/20', aktif);
+    card.classList.toggle('border-slate-200', !aktif);
+  });
+}
+
+function setupColorSync(colorId, hexId) {
+  const colorEl = document.getElementById(colorId);
+  const hexEl = document.getElementById(hexId);
+  colorEl.addEventListener('input', () => { hexEl.value = colorEl.value; });
+  hexEl.addEventListener('input', () => {
+    if (/^#[0-9a-fA-F]{6}$/.test(hexEl.value)) colorEl.value = hexEl.value;
+  });
+}
+
+function loadTemaAdmin() {
+  const p = profilData;
+  temaTerpilih = p.tema_pilihan || 'navy-gold';
+  if (p.tema_custom_primer) { document.getElementById('temaCustomPrimer').value = p.tema_custom_primer; document.getElementById('temaCustomPrimerHex').value = p.tema_custom_primer; }
+  if (p.tema_custom_aksen) { document.getElementById('temaCustomAksen').value = p.tema_custom_aksen; document.getElementById('temaCustomAksenHex').value = p.tema_custom_aksen; }
+  renderTemaPresetGrid();
+  document.getElementById('temaCustomPicker').classList.toggle('hidden', temaTerpilih !== 'custom');
+}
+
+async function handleSimpanTema() {
+  const btn = document.getElementById('btnSimpanTema');
+  const label = btn.querySelector('span');
+  btn.disabled = true; const original = label.textContent; label.textContent = 'Menyimpan...';
+  try {
+    const fields = { tema_pilihan: temaTerpilih };
+    if (temaTerpilih === 'custom') {
+      fields.tema_custom_primer = document.getElementById('temaCustomPrimerHex').value || '#1e3a8a';
+      fields.tema_custom_aksen = document.getElementById('temaCustomAksenHex').value || '#eab308';
+    }
+    const res = await postToApi('update_profil', { fields });
+    if (res.success) {
+      showToast('Tema website berhasil disimpan. Buka website untuk melihat hasilnya.', 'success');
+      await loadProfilAdmin();
+      loadTemaAdmin();
+    } else {
+      showToast(res.error || 'Gagal menyimpan tema.', 'error');
     }
   } catch (err) {
     showToast('Terjadi kesalahan koneksi ke server.', 'error');
