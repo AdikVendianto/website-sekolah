@@ -18,9 +18,17 @@
     theme: {
       extend: {
         colors: {
-          navy: { DEFAULT: '#1e3a8a', dark: '#132a63', light: '#3151ab' },
-          gold: { DEFAULT: '#eab308', dark: '#ca8a04', light: '#fde68a' },
-          cloud: '#F7F8FC'
+          navy: {
+            DEFAULT: 'rgb(var(--c-navy) / <alpha-value>)',
+            dark: 'rgb(var(--c-navy-dark) / <alpha-value>)',
+            light: 'rgb(var(--c-navy-light) / <alpha-value>)'
+          },
+          gold: {
+            DEFAULT: 'rgb(var(--c-gold) / <alpha-value>)',
+            dark: 'rgb(var(--c-gold-dark) / <alpha-value>)',
+            light: 'rgb(var(--c-gold-light) / <alpha-value>)'
+          },
+          cloud: 'rgb(var(--c-cloud) / <alpha-value>)'
         },
         fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
       }
@@ -32,21 +40,30 @@
 <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
 
 <style>
+  :root {
+    --c-navy: 30 58 138;
+    --c-navy-dark: 19 42 99;
+    --c-navy-light: 49 81 171;
+    --c-gold: 234 179 8;
+    --c-gold-dark: 202 138 4;
+    --c-gold-light: 253 230 138;
+    --c-cloud: 247 248 252;
+  }
   html { scroll-behavior: smooth; }
   body { font-family: 'Plus Jakarta Sans', sans-serif; }
   .font-serif-accent { font-family: Georgia, 'Times New Roman', serif; }
 
   .dot-grid {
-    background-image: radial-gradient(circle, rgba(30,58,138,0.14) 1.5px, transparent 1.5px);
+    background-image: radial-gradient(circle, rgb(var(--c-navy) / 0.14) 1.5px, transparent 1.5px);
     background-size: 22px 22px;
   }
 
   .eyebrow { letter-spacing: 0.14em; }
 
-  ::selection { background: #eab308; color: #1e3a8a; }
+  ::selection { background: rgb(var(--c-gold)); color: rgb(var(--c-navy)); }
 
   a, button { transition: all 0.2s ease; }
-  :focus-visible { outline: 3px solid #eab308; outline-offset: 2px; border-radius: 4px; }
+  :focus-visible { outline: 3px solid rgb(var(--c-gold)); outline-offset: 2px; border-radius: 4px; }
 
   @keyframes pulse-soft { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
   .skeleton { animation: pulse-soft 1.4s ease-in-out infinite; }
@@ -54,7 +71,7 @@
   .nav-link { position: relative; }
   .nav-link::after {
     content: ''; position: absolute; left: 0; bottom: -4px; width: 0; height: 2px;
-    background: #eab308; transition: width 0.25s ease;
+    background: rgb(var(--c-gold)); transition: width 0.25s ease;
   }
   .nav-link:hover::after, .nav-link.active::after { width: 100%; }
 
@@ -62,7 +79,7 @@
   #mobileMenu.open { max-height: 600px; }
 
   .card-hover { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 35px -15px rgba(30,58,138,0.25); }
+  .card-hover:hover { transform: translateY(-6px); box-shadow: 0 20px 35px -15px rgb(var(--c-navy) / 0.25); }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -71,8 +88,8 @@
 
   #modalBerita { transition: opacity 0.2s ease; }
 
-  .tab-btn.active { background: #1e3a8a; color: #fff; }
-  .tab-btn:not(.active) { background: #fff; color: #1e3a8a; }
+  .tab-btn.active { background: rgb(var(--c-navy)); color: #fff; }
+  .tab-btn:not(.active) { background: #fff; color: rgb(var(--c-navy)); }
 </style>
 </head>
 
@@ -502,6 +519,7 @@
       <div class="flex gap-3 pt-2">
         <a href="#" id="kontak-sosmed-fb" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Facebook</a>
         <a href="#" id="kontak-sosmed-ig" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">Instagram</a>
+        <a href="#" id="kontak-sosmed-tt" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">TikTok</a>
         <a href="#" id="kontak-sosmed-yt" class="hidden px-4 py-2 rounded-full bg-navy/10 text-navy text-xs font-bold hover:bg-navy hover:text-white">YouTube</a>
       </div>
 
@@ -566,6 +584,7 @@
       <div class="flex gap-2">
         <a href="#" id="footer-sosmed-fb" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">FB</a>
         <a href="#" id="footer-sosmed-ig" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">IG</a>
+        <a href="#" id="footer-sosmed-tt" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">TT</a>
         <a href="#" id="footer-sosmed-yt" class="hidden px-3 py-1.5 rounded-full bg-white/10 text-xs font-bold hover:bg-gold hover:text-navy">YT</a>
       </div>
     </div>
@@ -600,6 +619,97 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbyX1pP56Qd_36Km9Uqx6um-ywfq7vRYzR4wXDzMg13uhGn2xxME1u3Hvj4bdNTuodS9/exec';
 
 let DATA = { berita: [], pengumuman: [], guru: [], galeri: [], profil: {} };
+
+/* ---------- SISTEM TEMA WARNA ---------- */
+const TEMA_PRESET = {
+  'navy-gold':   { navy: '30 58 138',  navyDark: '19 42 99',   navyLight: '49 81 171',   gold: '234 179 8', goldDark: '202 138 4', goldLight: '253 230 138', cloud: '247 248 252', navyHex: '#1e3a8a', goldHex: '#eab308' },
+  'hijau-krem':  { navy: '20 83 45',   navyDark: '15 61 34',   navyLight: '31 122 63',   gold: '217 119 6', goldDark: '180 83 9',  goldLight: '253 230 138', cloud: '246 248 244', navyHex: '#14532d', goldHex: '#d97706' },
+  'marun-krem':  { navy: '127 29 29',  navyDark: '96 22 22',   navyLight: '161 48 48',   gold: '234 179 8', goldDark: '202 138 4', goldLight: '253 230 138', cloud: '251 247 245', navyHex: '#7f1d1d', goldHex: '#eab308' },
+  'biru-oranye': { navy: '12 74 110',  navyDark: '7 48 72',    navyLight: '20 122 184',  gold: '249 115 22',goldDark: '194 65 12', goldLight: '254 215 170',cloud: '245 250 252', navyHex: '#0c4a6e', goldHex: '#f97316' },
+  'ungu-gold':   { navy: '76 29 149',  navyDark: '59 17 116',  navyLight: '109 40 217',  gold: '234 179 8', goldDark: '202 138 4', goldLight: '253 230 138', cloud: '248 247 252', navyHex: '#4c1d95', goldHex: '#eab308' },
+};
+// Warna hex tema yang sedang aktif, dipakai untuk mewarnai foto placeholder (ui-avatars.com)
+let AKTIF_HEX = { navy: '1e3a8a', gold: 'eab308' };
+
+function setThemeVars(t) {
+  const root = document.documentElement.style;
+  root.setProperty('--c-navy', t.navy);
+  root.setProperty('--c-navy-dark', t.navyDark);
+  root.setProperty('--c-navy-light', t.navyLight);
+  root.setProperty('--c-gold', t.gold);
+  root.setProperty('--c-gold-dark', t.goldDark);
+  root.setProperty('--c-gold-light', t.goldLight);
+  root.setProperty('--c-cloud', t.cloud);
+}
+
+function hexToRgbArr(hex) {
+  hex = String(hex).replace('#', '').trim();
+  if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+  const num = parseInt(hex, 16) || 0;
+  return [(num >> 16) & 255, (num >> 8) & 255, num & 255];
+}
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h, s, l = (max + min) / 2;
+  if (max === min) { h = s = 0; }
+  else {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h /= 6;
+  }
+  return [h * 360, s * 100, l * 100];
+}
+function hslToRgb(h, s, l) {
+  h /= 360; s /= 100; l /= 100;
+  let r, g, b;
+  if (s === 0) { r = g = b = l; }
+  else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1; if (t > 1) t -= 1;
+      if (t < 1/6) return p + (q - p) * 6 * t;
+      if (t < 1/2) return q;
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+      return p;
+    };
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+// Menggeser terang/gelap sebuah warna hex, dipakai untuk menurunkan varian dark/light dari 1 warna kustom
+function geserTerang(hex, deltaPersen) {
+  const [r, g, b] = hexToRgbArr(hex);
+  let [h, s, l] = rgbToHsl(r, g, b);
+  l = Math.max(4, Math.min(96, l + deltaPersen));
+  const [nr, ng, nb] = hslToRgb(h, s, l);
+  return `${nr} ${ng} ${nb}`;
+}
+function rgbTripletFromHex(hex) {
+  const [r, g, b] = hexToRgbArr(hex);
+  return `${r} ${g} ${b}`;
+}
+
+function applyTema(p) {
+  const pilihan = p.tema_pilihan || 'navy-gold';
+  if (pilihan === 'custom' && p.tema_custom_primer && p.tema_custom_aksen) {
+    const primer = p.tema_custom_primer, aksen = p.tema_custom_aksen;
+    setThemeVars({
+      navy: rgbTripletFromHex(primer), navyDark: geserTerang(primer, -12), navyLight: geserTerang(primer, 12),
+      gold: rgbTripletFromHex(aksen), goldDark: geserTerang(aksen, -12), goldLight: geserTerang(aksen, 28),
+      cloud: '247 248 252'
+    });
+    AKTIF_HEX = { navy: primer.replace('#', ''), gold: aksen.replace('#', '') };
+  } else if (TEMA_PRESET[pilihan]) {
+    const t = TEMA_PRESET[pilihan];
+    setThemeVars(t);
+    AKTIF_HEX = { navy: t.navyHex.replace('#', ''), gold: t.goldHex.replace('#', '') };
+  }
+}
 
 /* ---------- LOADING OVERLAY ---------- */
 let loaderHidden = false;
@@ -643,6 +753,7 @@ async function loadData() {
     DATA.galeri = json.data.galeri || [];
     DATA.profil = json.data.profil || {};
 
+    safeRender(() => applyTema(DATA.profil));
     safeRender(renderProfil);
     safeRender(renderKonten);
     safeRender(renderGaleri);
@@ -719,7 +830,7 @@ function renderProfil() {
   if (p.nama_kepala_sekolah) document.getElementById('nama-kepsek').textContent = p.nama_kepala_sekolah;
   if (p.sambutan_kepala_sekolah) document.getElementById('sambutan-text').textContent = p.sambutan_kepala_sekolah;
   if (p.foto_kepala_sekolah) document.getElementById('foto-kepsek').src = p.foto_kepala_sekolah;
-  else if (p.nama_kepala_sekolah) document.getElementById('foto-kepsek').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama_kepala_sekolah)}&background=1e3a8a&color=eab308&size=480&bold=true`;
+  else if (p.nama_kepala_sekolah) document.getElementById('foto-kepsek').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(p.nama_kepala_sekolah)}&background=${AKTIF_HEX.navy}&color=${AKTIF_HEX.gold}&size=480&bold=true`;
 
   if (p.jumlah_siswa) document.getElementById('stat-siswa').dataset.target = p.jumlah_siswa;
   if (p.jumlah_kelas) document.getElementById('stat-kelas').dataset.target = p.jumlah_kelas;
@@ -728,9 +839,11 @@ function renderProfil() {
 
   setSosmedLink('kontak-sosmed-fb', p.sosmed_facebook);
   setSosmedLink('kontak-sosmed-ig', p.sosmed_instagram);
+  setSosmedLink('kontak-sosmed-tt', p.sosmed_tiktok);
   setSosmedLink('kontak-sosmed-yt', p.sosmed_youtube);
   setSosmedLink('footer-sosmed-fb', p.sosmed_facebook);
   setSosmedLink('footer-sosmed-ig', p.sosmed_instagram);
+  setSosmedLink('footer-sosmed-tt', p.sosmed_tiktok);
   setSosmedLink('footer-sosmed-yt', p.sosmed_youtube);
 
   if (alamat) document.getElementById('map-iframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(alamat)}&output=embed`;
@@ -879,7 +992,7 @@ function renderGuru() {
     return;
   }
   grid.innerHTML = DATA.guru.map(g => {
-    const foto = g.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.nama)}&background=1e3a8a&color=eab308&size=300&bold=true`;
+    const foto = g.foto_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.nama)}&background=${AKTIF_HEX.navy}&color=${AKTIF_HEX.gold}&size=300&bold=true`;
     return `
     <div class="card-hover bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
       <img src="${escapeHtml(foto)}" alt="Foto ${escapeHtml(g.nama)}" class="w-full h-40 object-cover">
@@ -911,7 +1024,7 @@ function renderBeritaFull() {
 }
 
 function beritaCard(b) {
-  const gambar = b.gambar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.kategori||'Berita')}&background=eab308&color=1e3a8a&size=400`;
+  const gambar = b.gambar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.kategori||'Berita')}&background=${AKTIF_HEX.gold}&color=${AKTIF_HEX.navy}&size=400`;
   const tanggal = formatTanggal(b.tanggal);
   return `
   <div class="card-hover bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
@@ -959,7 +1072,7 @@ function emptyState(text) {
 function openModal(id) {
   const b = DATA.berita.find(x => String(x.id) === String(id));
   if (!b) return;
-  document.getElementById('modal-img').src = b.gambar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.kategori||'Berita')}&background=eab308&color=1e3a8a&size=600`;
+  document.getElementById('modal-img').src = b.gambar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.kategori||'Berita')}&background=${AKTIF_HEX.gold}&color=${AKTIF_HEX.navy}&size=600`;
   document.getElementById('modal-kategori').textContent = b.kategori || 'Umum';
   document.getElementById('modal-tanggal').textContent = formatTanggal(b.tanggal);
   document.getElementById('modal-judul').textContent = b.judul;
